@@ -225,9 +225,10 @@ def readm50(filename=None):
 "--------------------------------------------------------------------"
 
 
-def refine(filename=None, notes=''):
+def refine(filename=None, notes='', save=True):
     """
     Display last Jana2006 refinement as a well formated text, and save this to a file
+    returns string
     """
 
     # Get file name
@@ -251,17 +252,10 @@ def refine(filename=None, notes=''):
         all_pos = dgp.gen_sym_pos(sym, *crys['atom position'][N])
         occ_frac[N] = nsymm / len(all_pos)
 
-    # Create Note file
-    fout = 'Refinement ' + time.strftime('%Y %m%b %d') + '.txt'
-    out = open(os.path.join(dirName, fout), 'a')
-
-    out.write('--------------' + refDate + '--------------\n')
-    out.write(filename[:-3] + '\n')
-    out.write(notes + '\n')
-    out.write('GoF = {:5.2f} R = {:5.2f} Rw = {:5.2f}\n'.format(GOFall, Rall, Rwall))
-    print('--------------' + refDate + '--------------')
-    print(notes)
-    print('GoF = {:5.2f} R = {:5.2f} Rw = {:5.2f}'.format(GOFall, Rall, Rwall))
+    out = '--------------' + refDate + '--------------\n'
+    out += filename[:-3] + '\n'
+    out += notes + '\n'
+    out += 'GoF = {:5.2f} R = {:5.2f} Rw = {:5.2f}\n'.format(GOFall, Rall, Rwall)
 
     # Display each atom
     for N in range(natom):
@@ -276,24 +270,25 @@ def refine(filename=None, notes=''):
         u13 = dgp.stfm(crys['uaniso'][N, 4], err['uaniso'][N, 4])
         u23 = dgp.stfm(crys['uaniso'][N, 5], err['uaniso'][N, 5])
         fmt = '{:8s} x:{:12s} y:{:12s} z:{:12s} occ:{:12s}'
-        fmt += '     U11:{:12s} U22:{:12s} U33:{:12s} U12:{:12s} U13:{:12s} U23:{:12s}'
-        print(fmt.format(crys['atom label'][N], x, y, z, o, u11, u22, u33, u12, u13, u23))
-        out.write(fmt.format(crys['atom label'][N], x, y, z, o, u11, u22, u33, u12, u13, u23)+'\n')
+        fmt += '     U11:{:12s} U22:{:12s} U33:{:12s} U12:{:12s} U13:{:12s} U23:{:12s}\n'
+        out += fmt.format(crys['atom label'][N], x, y, z, o, u11, u22, u33, u12, u13, u23)
 
     if np.any(crys['uaniso'] < -3 * err['uaniso']):
-        print('***{} Negative ADPs***'.format(np.sum(crys['uaniso'] < -3 * err['uaniso'])))
-        out.write('***{} Negative ADPs***\n'.format(np.sum(crys['uaniso'] < -3 * err['uaniso'])))
+        out += '***{} Negative ADPs***\n'.format(np.sum(crys['uaniso'] < -3 * err['uaniso']))
     if np.any(crys['uaniso'] > 0.1):
-        print('***{} Large ADPs***'.format(np.sum(crys['uaniso'] > 0.1)))
-        out.write('***{} Large ADPs***\n'.format(np.sum(crys['uaniso'] > 0.1)))
+        out += '***{} Large ADPs***\n'.format(np.sum(crys['uaniso'] > 0.1))
     if np.any(crys['occupancy'] < -err['occupancy']):
-        print('***{} Negative Occupancies***'.format(np.sum(crys['occupancy'] < -3 * err['occupancy'])))
-        out.write('***{} Negative Occupancies***\n'.format(np.sum(crys['occupancy'] < -3 * err['occupancy'])))
+        out += '***{} Negative Occupancies***\n'.format(np.sum(crys['occupancy'] < -3 * err['occupancy']))
     if np.any(crys['occupancy'] * np.array(occ_frac) > 1):
-        print('***{} Occupancies > 1***'.format(np.sum(crys['occupancy'] * np.array(occ_frac) > 1)))
-        out.write('***{} Occupancies > 1***\n'.format(np.sum(crys['occupancy'] * np.array(occ_frac) > 1)))
-    out.write('\n')
-    out.close()
+        out += '***{} Occupancies > 1***\n'.format(np.sum(crys['occupancy'] * np.array(occ_frac) > 1))
+    out += '\n'
+
+    if save:
+        # Create Note file
+        fout = 'Refinement ' + time.strftime('%Y %m%b %d') + '.txt'
+        with open(os.path.join(dirName, fout), 'a') as fout:
+            fout.write(out)
+    return out
 
 
 def refinementtable(filename=None, occ_frac=None):

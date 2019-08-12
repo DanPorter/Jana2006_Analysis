@@ -20,13 +20,20 @@ class Refine:
 
         self.filename = filename
         self.title = fname
+        self.m40file = os.path.join(dirName, fname + '.m40')
 
-        crys, error = readm40(os.path.join(dirName, fname + '.m40'))
+        crys, error = readm40(self.m40file)
         self.crystal_dict = crys
         self.error_dict = error
 
     def update(self, notes=''):
-        refine(self.filename, notes)
+        print(refine(self.filename, notes, save=True))
+        crys, error = readm40(self.m40file)
+        self.crystal_dict = crys
+        self.error_dict = error
+
+    def refine_results(self):
+        return refine(self.filename, save=False)
 
     def create_table(self):
         refinementtable(self.filename)
