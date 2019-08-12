@@ -275,10 +275,10 @@ def refine(filename=None, notes=''):
         u12 = dgp.stfm(crys['uaniso'][N, 3], err['uaniso'][N, 3])
         u13 = dgp.stfm(crys['uaniso'][N, 4], err['uaniso'][N, 4])
         u23 = dgp.stfm(crys['uaniso'][N, 5], err['uaniso'][N, 5])
-        fmt = '{:8s} x:{:12s} y:{:12s} z:{:12s} occ:{:12s}\n'
-        fmt += 'U11:{:12s} U22:{:12s} U33:{:12s} U12:{:12s} U13:{:12s} U23:{:12s}'
+        fmt = '{:8s} x:{:12s} y:{:12s} z:{:12s} occ:{:12s}'
+        fmt += '     U11:{:12s} U22:{:12s} U33:{:12s} U12:{:12s} U13:{:12s} U23:{:12s}'
         print(fmt.format(crys['atom label'][N], x, y, z, o, u11, u22, u33, u12, u13, u23))
-        out.write(fmt.format(crys['atom label'][N], x, y, z, o, u11, u22, u33, u12, u13, u23))
+        out.write(fmt.format(crys['atom label'][N], x, y, z, o, u11, u22, u33, u12, u13, u23)+'\n')
 
     if np.any(crys['uaniso'] < -3 * err['uaniso']):
         print('***{} Negative ADPs***'.format(np.sum(crys['uaniso'] < -3 * err['uaniso'])))

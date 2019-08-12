@@ -8,5 +8,5 @@ f = r"C:\Users\dgpor\Dropbox\Mini Projects\Ca2RuO4\XRD Ca2RuO4 Feb 2017\Refine 2
 
 ref = jana.Refine(f)
 
-#ref.update()
-ref.create_table()
+ref.update()
+#ref.create_table()
